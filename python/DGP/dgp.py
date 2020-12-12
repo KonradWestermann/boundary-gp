@@ -22,8 +22,6 @@ from gpflow.models.model import InputData, MeanAndVariance
 from gpflow.models.util import data_input_to_tensor
 from gpflow.models.training_mixins import InternalDataTrainingLossMixin
 
-from tensorflow import name_scope
-
 float_type = gpflow.default_float()
 from .matrix_structures import DiagMat
 
@@ -62,7 +60,6 @@ class DGP(gpflow.models.GPModel, InternalDataTrainingLossMixin):
     def predict_f(self, Xnew: InputData, full_cov: bool = False, full_output_cov: bool = False) -> MeanAndVariance:
         return self._build_predict(Xnew, full_cov)
 
-    #@name_scope('KL')
     def build_KL(self):
         """
         We're working in a 'whitened' representation, so this is the KL between
@@ -77,7 +74,6 @@ class DGP(gpflow.models.GPModel, InternalDataTrainingLossMixin):
         KL += 0.5*Kuu.logdet()  # Log det P
         return KL
 
-    #@name_scope('likelihood')
     def _build_likelihood(self):
         # computes the variational lower bound of the likelihood (ELBO)???
         # compute the mean and variance of the latent function
@@ -89,7 +85,6 @@ class DGP(gpflow.models.GPModel, InternalDataTrainingLossMixin):
         E_lik = self.likelihood.variational_expectations(f_mu, f_var, Y_data)
         return tf.reduce_sum(E_lik) - self.build_KL()
 
-    #@name_scope('predict')
     def _build_predict(self, X, full_cov=False):
         Kuf = self.make_Kuf(X)
         Kuu = self.make_Kuu(self.kernel, self.num_input)
